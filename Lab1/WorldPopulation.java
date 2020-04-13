@@ -1,51 +1,83 @@
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.Reader;
 import java.util.StringTokenizer;
 
 public class WorldPopulation {
 
 	SortStrategy sortStrategy;
-	long[] population = new long[13484]; // Cheating because we know number of records!!
-	// Lab Exercise:  After creating some strategy classes -- set the default strategy here.
-	public WorldPopulation(){
-		sortStrategy = new #; // Set the default strategy here.	
-	}
-	
-	public void readInputFile(){
-		population = readPopulationFile("src\\WorldPopulation.csv");
-	}
-	
-	public void setStrategy(SortStrategy strategy){
-		sortStrategy = strategy;
-	}
-	
-	// Lab Exercise:  Read in the WorldPopulation.csv
-	// Extract ONLY the numbers and store them into population[]
-	public long[] readPopulationFile(String fileName){
-	  
-		return population;
-	}
-	
-	// Lab Exercise.  Complete this method.
-	// Delegate sorting to the strategy object
-	public void sortPopulation(){		
-		
-	}
-	
-	public void computeTotalPopulation(){
-		System.out.println("dd");
-	}
-	
-	// Experiment with various strategies.
-	// Create 3 strategies -- Bubble, insertion, and selection sort.
-	public static void main(String[] args) {
-		WorldPopulation worldPopulation = new WorldPopulation();
-		worldPopulation.readInputFile();
-		worldPopulation.setStrategy(#); //  Currently no strategies.
-		worldPopulation.sortPopulation();	
+	long[] population = new long[13484]; // Because we already know the number of records!
+
+	public WorldPopulation() {
+		sortStrategy = new BubbleSort();  // sets default strategy
 	}
 
+	public void readInputFile(String inputFile) {
+		population = readPopulationFile(inputFile);
+	}
+
+	public void setStrategy(SortStrategy strategy) {
+		sortStrategy = strategy;
+	}
+
+	// Reads in the WorldPopulation.csv
+	// Extracts ONLY the numbers and stores them into population[]
+	public long[] readPopulationFile(String fileName) {
+		int index = 0;
+		try {
+			FileReader inputFile = new FileReader(fileName);
+			BufferedReader reader = new BufferedReader(inputFile);
+			String line;
+			// reads each line
+			while((line = reader.readLine()) != null) {
+				StringTokenizer tokenizer = new StringTokenizer(line, ",");
+				String countryName = tokenizer.nextToken();
+				String year = tokenizer.nextToken();
+				String pop = tokenizer.nextToken();
+				long popCount = Long.parseLong(pop);
+				population[index++]=popCount;
+			}
+			reader.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return population;
+	}
+
+	public void sortPopulation() {
+		sortStrategy.sort(population);
+		System.out.println("Sorted using " + sortStrategy.strategyName() + " in " + sortStrategy.getSortTime() + " milliseconds.");
+	}
+
+	public void computeTotalPopulation() {
+		System.out.println("dd");
+	}
+
+	public static void main(String[] args) {
+		String fileName = "Lab1\\WorldPopulation.csv";
+		if (args.length > 0) {
+			if (!args[0].equals("")){
+				fileName = args[0];
+			}
+		}
+		System.out.println("input filename: "+ fileName);
+		WorldPopulation worldPopulation = new WorldPopulation();
+		worldPopulation.readInputFile(fileName);
+		worldPopulation.setStrategy(new InsertionSort());
+		worldPopulation.sortPopulation();
+		worldPopulation.readInputFile(fileName);
+		worldPopulation.setStrategy(new SelectionSort());
+		worldPopulation.sortPopulation();
+		worldPopulation.readInputFile(fileName);
+		worldPopulation.setStrategy(new BubbleSort());
+		worldPopulation.sortPopulation();
+
+		// calling the sort methods for sorted
+		System.out.println("\ncalling sort methods on sorted population:");
+		worldPopulation.sortPopulation();
+		worldPopulation.setStrategy(new SelectionSort());
+		worldPopulation.sortPopulation();
+		worldPopulation.setStrategy(new InsertionSort());
+		worldPopulation.sortPopulation();
+	}
 }
